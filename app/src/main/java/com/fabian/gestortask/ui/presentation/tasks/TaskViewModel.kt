@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.domain.usecases.task.TaskUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(

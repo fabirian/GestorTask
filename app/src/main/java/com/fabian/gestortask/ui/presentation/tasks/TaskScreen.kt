@@ -21,7 +21,7 @@ import com.fabian.gestortask.domain.model.Task
 @Composable
 fun TaskScreen(
     navController: NavController,
-    taskId: Int?,
+    taskId: String,
     viewModel: TaskViewModel = hiltViewModel()
 ) {
     var title by remember { mutableStateOf("") }

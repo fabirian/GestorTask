@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.fabian.gestortask.ui.navigation.Screen
 import com.fabian.gestortask.ui.presentation.configuration.About
 import com.fabian.gestortask.ui.presentation.configuration.ConfiguracionScreen
 import com.fabian.gestortask.ui.presentation.configuration.Feedback
@@ -21,7 +22,9 @@ import com.fabian.gestortask.ui.presentation.register.RegisterScreen
 import com.fabian.gestortask.ui.presentation.tasks.TaskScreen
 import com.fabian.gestortask.ui.presentation.tasks.ListTaskScreen
 import com.fabian.gestortask.ui.theme.GestorTaskTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,47 +42,58 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation () {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
+    NavHost(navController = navController, startDestination = Screen.TaskList.route) {
+
+        composable(Screen.TaskList.route) {
             ListTaskScreen(navController)
         }
+
         composable(
-            route = "task_screen?taskId={taskId}",
+            route = Screen.EditTask.route,
             arguments = listOf(
                 navArgument("taskId") {
-                    type = NavType.IntType
-                    defaultValue = -1
-                    nullable = true
+                    type = NavType.StringType
+                    nullable = false
                 }
             )
         ) { backStackEntry ->
-            val taskId = backStackEntry.arguments?.getInt("taskId") ?: -1
+            val taskId = backStackEntry.arguments?.getString("taskId") ?: return@composable
             TaskScreen(
                 navController = navController,
-                taskId = if (taskId == -1) null else taskId
+                taskId = taskId
             )
         }
-        composable("configuracion") {
+
+        composable(Screen.AddTask.route) {
+            TaskScreen(navController = navController, taskId = null.toString())
+        }
+
+        composable(Screen.Configuracion.route) {
             ConfiguracionScreen(navController)
         }
-        composable("login") {
+
+        composable(Screen.Login.route) {
             LoginScreen(navController)
         }
-        composable("registro") {
+
+        composable(Screen.Register.route) {
             RegisterScreen(navController)
         }
-        composable("help") {
+
+        composable(Screen.Help.route) {
             Help(navController)
         }
-        composable("about") {
+
+        composable(Screen.About.route) {
             About(navController)
         }
-        composable("support") {
+
+        composable(Screen.Support.route) {
             Support(navController)
         }
-        composable("feedback") {
+
+        composable(Screen.Feedback.route) {
             Feedback(navController)
         }
     }
 }
-
