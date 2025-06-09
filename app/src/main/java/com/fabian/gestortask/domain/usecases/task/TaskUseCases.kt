@@ -1,8 +1,11 @@
 package com.fabian.gestortask.domain.usecases.task
 
+import com.fabian.gestortask.domain.model.Task
+
 data class TaskUseCases(
-    val addTask: AddTask,
     val getTasks: GetTasks,
+    val addTask: AddTask,
+    val updateTask: UpdateTask,
     val deleteTask: DeleteTask,
-    val updateTask: UpdateTask
+    val getTaskById: GetTaskById
 )

@@ -65,7 +65,7 @@ fun AppNavigation () {
         }
 
         composable(Screen.AddTask.route) {
-            TaskScreen(navController = navController, taskId = null.toString())
+            TaskScreen(navController = navController, taskId = null)
         }
 
         composable(Screen.Configuracion.route) {

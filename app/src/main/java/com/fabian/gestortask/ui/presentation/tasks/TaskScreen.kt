@@ -21,19 +21,30 @@ import com.fabian.gestortask.domain.model.Task
 @Composable
 fun TaskScreen(
     navController: NavController,
-    taskId: String,
+    taskId: String?,
     viewModel: TaskViewModel = hiltViewModel()
 ) {
+    val isTaskSaved = viewModel.isTaskSaved
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
+    val task = viewModel.currentTask
+
     LaunchedEffect(taskId) {
-        if (taskId != null) {
-            val task = viewModel.tasks.find { it.id == taskId }
-            task?.let {
-                title = it.title
-                description = it.description
-            }
+        taskId?.let { viewModel.loadTaskById(it) }
+    }
+
+    LaunchedEffect(isTaskSaved) {
+        if (isTaskSaved) {
+            navController.popBackStack()
+            viewModel.resetSaveState()
+        }
+    }
+
+    LaunchedEffect(task) {
+        task?.let {
+            title = it.title
+            description = it.description
         }
     }
 
@@ -56,20 +67,20 @@ fun TaskScreen(
 
         Button(
             onClick = {
-                val task = Task(
-                    id = taskId ?: 0,
+                val taskToSave = Task(
+                    id = taskId ?: "",
                     title = title,
                     description = description,
-                    isDone = false
+                    isDone = task?.isDone ?: false,
+                    userId = task?.userId ?: ""
                 )
 
                 if (taskId == null) {
-                    viewModel.addTask(task)
+                    viewModel.addTask(taskToSave)
                 } else {
-                    viewModel.updateTask(task)
+                    viewModel.updateTask(taskToSave)
                 }
 
-                navController.popBackStack()
             },
             modifier = Modifier.padding(top = 16.dp)
         ) {
@@ -77,4 +88,3 @@ fun TaskScreen(
         }
     }
 }
-

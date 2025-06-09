@@ -4,10 +4,10 @@ sealed class Screen(val route: String) {
 
     object TaskList : Screen("task_list")
 
-    object AddTask : Screen("add_task")
+    object AddTask : Screen("task_screen")
 
-    object EditTask : Screen("edit_task/{taskId}") {
-        fun createRoute(taskId: String) = "edit_task/$taskId"
+    object EditTask : Screen("task_screen?taskId={taskId}") {
+        fun createRoute(taskId: String) = "task_screen?taskId=$taskId"
     }
 
     object Configuracion : Screen("configuracion")
@@ -23,6 +23,4 @@ sealed class Screen(val route: String) {
     object Support : Screen("support")
 
     object Feedback : Screen("feedback")
-
 }
-

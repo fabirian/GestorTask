@@ -4,15 +4,18 @@ import com.fabian.gestortask.data.repository.TaskRepositoryImpl
 import com.fabian.gestortask.domain.repository.TaskRepository
 import com.fabian.gestortask.domain.usecases.task.AddTask
 import com.fabian.gestortask.domain.usecases.task.DeleteTask
+import com.fabian.gestortask.domain.usecases.task.GetTaskById
 import com.fabian.gestortask.domain.usecases.task.GetTasks
 import com.fabian.gestortask.domain.usecases.task.TaskUseCases
 import com.fabian.gestortask.domain.usecases.task.UpdateTask
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -20,7 +23,16 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskRepository(): TaskRepository = TaskRepositoryImpl()
+    fun provideFirestore(@ApplicationContext context: android.content.Context): FirebaseFirestore {
+        FirebaseApp.initializeApp(context)
+        return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTaskRepository(
+        firestore: FirebaseFirestore
+    ): TaskRepository = TaskRepositoryImpl(firestore)
 
     @Provides
     @Singleton
@@ -29,7 +41,9 @@ object AppModule {
             addTask = AddTask(repository),
             getTasks = GetTasks(repository),
             deleteTask = DeleteTask(repository),
-            updateTask = UpdateTask(repository)
+            updateTask = UpdateTask(repository),
+            getTaskById = GetTaskById(repository)
         )
     }
 }
+

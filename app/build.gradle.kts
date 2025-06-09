@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -56,6 +57,14 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.media3.common.ktx)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.androidx.hilt.compiler)
@@ -69,6 +78,21 @@ dependencies {
     // Retrofit
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
+
+    // Import the Firebase BoM
+    implementation(platform(libs.firebase.bom))
+
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation(libs.firebase.analytics)
+
+    //Firebase authentication
+    implementation (libs.firebase.auth.ktx)
+
+    implementation(libs.google.services)
+
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
