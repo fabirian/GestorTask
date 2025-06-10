@@ -3,11 +3,12 @@ package com.fabian.gestortask.auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseAuthManager(
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class FirebaseAuthManager @Inject constructor(
+    private val auth: FirebaseAuth
 ) {
     suspend fun login(email: String, password: String): Result<Unit> {
         return try {
@@ -30,16 +31,11 @@ class FirebaseAuthManager(
                 }
         }
 
-    fun logout() {
-        auth.signOut()
-    }
+    fun logout() = auth.signOut()
 
-    fun isLoggedIn(): Boolean {
-        return auth.currentUser != null
-    }
+    fun isLoggedIn(): Boolean = auth.currentUser != null
 
-    fun getCurrentUserEmail(): String? {
-        return auth.currentUser?.email
-    }
+    fun getCurrentUserEmail(): String? = auth.currentUser?.email
+
+    fun getCurrentUserId(): String? = auth.currentUser?.uid
 }
-

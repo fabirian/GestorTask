@@ -74,7 +74,7 @@ fun Help(navController: NavController? = null) {
             item {
                 TitleSection("Contacto")
                 Text(
-                    "Puedes contactarnos en support@taskzen.com para obtener ayuda adicional.",
+                    "Puedes contactarnos en support@task.com para obtener ayuda adicional.",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(16.dp)
                 )

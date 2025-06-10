@@ -76,7 +76,7 @@ fun ConfiguracionScreen(navController: NavController? = null) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            navController?.navigate("login")
+                            navController?.navigate(Screen.Login.route)
                         }
                         .padding(16.dp)
                 )

@@ -1,22 +1,15 @@
 package com.fabian.gestortask.ui.presentation.tasks
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fabian.gestortask.domain.model.Task
+import com.fabian.gestortask.ui.presentation.tasks.components.TaskForm
 
 @Composable
 fun TaskScreen(
@@ -25,10 +18,10 @@ fun TaskScreen(
     viewModel: TaskViewModel = hiltViewModel()
 ) {
     val isTaskSaved = viewModel.isTaskSaved
+    val task = viewModel.currentTask
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-
-    val task = viewModel.currentTask
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTaskById(it) }
@@ -48,43 +41,23 @@ fun TaskScreen(
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    TaskForm(
+        title = title,
+        onTitleChange = { title = it },
+        description = description,
+        onDescriptionChange = { description = it },
+        onSaveClick = {
+            val taskToSave = Task(
+                id = taskId ?: "",
+                title = title,
+                description = description,
+                isDone = task?.isDone ?: false,
+                userId = task?.userId ?: ""
+            )
 
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Descripción") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        )
-
-        Button(
-            onClick = {
-                val taskToSave = Task(
-                    id = taskId ?: "",
-                    title = title,
-                    description = description,
-                    isDone = task?.isDone ?: false,
-                    userId = task?.userId ?: ""
-                )
-
-                if (taskId == null) {
-                    viewModel.addTask(taskToSave)
-                } else {
-                    viewModel.updateTask(taskToSave)
-                }
-
-            },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(if (taskId == null) "Agregar tarea" else "Actualizar tarea")
-        }
-    }
+            if (taskId == null) viewModel.addTask(taskToSave)
+            else viewModel.updateTask(taskToSave)
+        },
+        isEdit = taskId != null
+    )
 }

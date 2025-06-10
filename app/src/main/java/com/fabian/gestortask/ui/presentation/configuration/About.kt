@@ -66,12 +66,12 @@ fun About(navController: NavController? = null) {
             )
             TitleSection("Acerca de la aplicación")
             Text(
-                "TaskZen v1.0.0",
+                "Task v1.0.0",
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(16.dp)
             )
             Text(
-                "© 2023 TaskZen Technologies",
+                "© 2023 Task Technologies",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(16.dp)
             )

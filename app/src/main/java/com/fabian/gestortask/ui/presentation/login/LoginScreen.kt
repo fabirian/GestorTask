@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,21 +14,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.fabian.gestortask.auth.FirebaseAuthManager
 import com.fabian.gestortask.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authManager: FirebaseAuthManager = FirebaseAuthManager()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
+    val loginResult = viewModel.loginResult
+
+    LaunchedEffect(loginResult) {
+        loginResult?.let {
+            if (it.isSuccess) {
+                navController.navigate("task_list") {
+                    popUpTo("login") { inclusive = true }
+                }
+                viewModel.resetLoginResult()
+            } else {
+                errorMessage = "Credenciales inválidas o error de red."
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -36,15 +47,17 @@ fun LoginScreen(
             .padding(16.dp)
     ) {
 
-        // Encabezado con botón de atrás
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navController.navigate("configuracion") }) {
-                Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = "Atrás")
+            IconButton(onClick = { navController.navigate(Screen.Configuracion.route) }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Atrás"
+                )
             }
             Text(
                 text = "Sign in",
@@ -57,15 +70,12 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-        // Título
         Text(
             text = "Sign in to your account",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(vertical = 20.dp)
         )
 
-        // Campos de entrada
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -85,7 +95,6 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        // Mensaje de error si hay
         errorMessage?.let {
             Text(
                 text = it,
@@ -98,22 +107,13 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(25.dp))
 
-        // Botón de inicio de sesión
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
                     errorMessage = "Por favor completa todos los campos."
                 } else {
-                    scope.launch {
-                        val result = authManager.login(email, password)
-                        if (result.isSuccess) {
-                            navController.navigate("task_list") {
-                                popUpTo("login") { inclusive = true }
-                            }
-                        } else {
-                            errorMessage = "Credenciales inválidas o error de red."
-                        }
-                    }
+                    errorMessage = null
+                    viewModel.login(email, password)
                 }
             },
             modifier = Modifier
@@ -126,7 +126,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(25.dp))
 
-        // Link de registro
         Row {
             Text(text = "¿No tienes una cuenta?")
             Spacer(modifier = Modifier.width(4.dp))
@@ -141,4 +140,3 @@ fun LoginScreen(
         }
     }
 }
-

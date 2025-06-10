@@ -8,25 +8,16 @@ import com.fabian.gestortask.domain.usecases.task.GetTaskById
 import com.fabian.gestortask.domain.usecases.task.GetTasks
 import com.fabian.gestortask.domain.usecases.task.TaskUseCases
 import com.fabian.gestortask.domain.usecases.task.UpdateTask
-import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideFirestore(@ApplicationContext context: android.content.Context): FirebaseFirestore {
-        FirebaseApp.initializeApp(context)
-        return FirebaseFirestore.getInstance()
-    }
 
     @Provides
     @Singleton
