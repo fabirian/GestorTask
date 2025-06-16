@@ -9,5 +9,7 @@ interface TaskRepository {
     suspend fun getTaskById(id: String): Task?
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(id: String)
+    suspend fun getTasksByListId(listId: String): List<Task>
+    suspend fun getCurrentUserId(): String?
 }
 

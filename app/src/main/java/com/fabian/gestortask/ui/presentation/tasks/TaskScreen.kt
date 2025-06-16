@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.ui.presentation.tasks.components.TaskForm
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun TaskScreen(
@@ -24,6 +25,7 @@ fun TaskScreen(
     var description by remember { mutableStateOf("") }
 
     LaunchedEffect(taskId) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
         taskId?.let { viewModel.loadTaskById(it) }
     }
 
@@ -46,18 +48,7 @@ fun TaskScreen(
         onTitleChange = { title = it },
         description = description,
         onDescriptionChange = { description = it },
-        onSaveClick = {
-            val taskToSave = Task(
-                id = taskId ?: "",
-                title = title,
-                description = description,
-                isDone = task?.isDone ?: false,
-                userId = task?.userId ?: ""
-            )
-
-            if (taskId == null) viewModel.addTask(taskToSave)
-            else viewModel.updateTask(taskToSave)
-        },
+        onSaveClick = { viewModel.addNewTask(title, description) },
         isEdit = taskId != null
     )
 }

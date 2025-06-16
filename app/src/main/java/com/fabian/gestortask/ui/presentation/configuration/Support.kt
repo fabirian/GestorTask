@@ -41,7 +41,7 @@ fun Support(navController: NavController? = null){
         ) {
             IconButton(
                 onClick = {
-                    navController?.navigate(Screen.TaskList.route)
+                    navController?.navigate(Screen.List.route)
                 },
                 modifier = Modifier
                     .height(50.dp)

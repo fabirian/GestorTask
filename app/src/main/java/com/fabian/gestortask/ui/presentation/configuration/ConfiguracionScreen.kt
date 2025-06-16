@@ -41,7 +41,7 @@ fun ConfiguracionScreen(navController: NavController? = null) {
         ) {
             IconButton(
                 onClick = {
-                    navController?.navigate(Screen.TaskList.route)
+                    navController?.navigate(Screen.List.route)
                 },
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -102,7 +102,7 @@ fun ConfiguracionScreen(navController: NavController? = null) {
                     onClick = {
                         firebaseAuth.signOut()
                         currentUser = null
-                        navController?.navigate(Screen.TaskList.route)
+                        navController?.navigate(Screen.List.route)
                     },
                     modifier = Modifier
                         .fillMaxWidth()

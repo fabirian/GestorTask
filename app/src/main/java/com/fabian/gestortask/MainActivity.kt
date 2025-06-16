@@ -17,7 +17,10 @@ import com.fabian.gestortask.ui.presentation.configuration.ConfiguracionScreen
 import com.fabian.gestortask.ui.presentation.configuration.Feedback
 import com.fabian.gestortask.ui.presentation.configuration.Help
 import com.fabian.gestortask.ui.presentation.configuration.Support
+import com.fabian.gestortask.ui.presentation.list.AddTaskListScreen
+import com.fabian.gestortask.ui.presentation.list.ListTaskListScreen
 import com.fabian.gestortask.ui.presentation.login.LoginScreen
+import com.fabian.gestortask.ui.presentation.perfil.PerfilScreen
 import com.fabian.gestortask.ui.presentation.register.RegisterScreen
 import com.fabian.gestortask.ui.presentation.tasks.TaskScreen
 import com.fabian.gestortask.ui.presentation.tasks.ListTaskScreen
@@ -42,9 +45,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation () {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.TaskList.route) {
+    NavHost(navController = navController, startDestination = Screen.List.route) {
 
-        composable(Screen.TaskList.route) {
+        composable(Screen.List.route) {
             ListTaskScreen(navController)
         }
 
@@ -66,6 +69,27 @@ fun AppNavigation () {
 
         composable(Screen.AddTask.route) {
             TaskScreen(navController = navController, taskId = null)
+        }
+
+        composable(Screen.ListTaskList.route) {
+            ListTaskListScreen(navController)
+        }
+
+        composable(Screen.AddTaskList.route) {
+            AddTaskListScreen(navController, taskListId = null)
+        }
+
+        composable(
+            route = Screen.EditTaskList.route,
+            arguments = listOf(
+                navArgument("listId") {
+                    type = NavType.StringType
+                    nullable = false
+                }
+            )
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getString("listId") ?: return@composable
+            AddTaskListScreen(navController = navController, taskListId =  listId)
         }
 
         composable(Screen.Configuracion.route) {
@@ -95,5 +119,12 @@ fun AppNavigation () {
         composable(Screen.Feedback.route) {
             Feedback(navController)
         }
+        
+        composable(Screen.Perfil.route) {
+            PerfilScreen(navController)
+        }
     }
 }
+
+
+

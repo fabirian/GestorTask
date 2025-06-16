@@ -3,20 +3,22 @@ package com.fabian.gestortask.data.remote
 import android.util.Log
 import com.fabian.gestortask.auth.FirebaseAuthManager
 import com.fabian.gestortask.domain.model.Task
-import com.google.firebase.auth.FirebaseAuth
+import com.fabian.gestortask.domain.model.TaskList
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class TaskRepositoryRemote @Inject constructor(
-    private val firestore: FirebaseFirestore,
+    val firestore: FirebaseFirestore,
     private val authManager: FirebaseAuthManager
 ) {
+
+    private val taskCollection = firestore.collection("tasks")
 
     suspend fun getTasks(): List<Task> {
         val userId = authManager.getCurrentUserId() ?: return emptyList()
         return try {
-            val snapshot = firestore.collection("tasks")
+            val snapshot = taskCollection
                 .whereEqualTo("userId", userId)
                 .get()
                 .await()
@@ -29,7 +31,7 @@ class TaskRepositoryRemote @Inject constructor(
 
     suspend fun getTaskById(id: String): Task? {
         return try {
-            val doc = firestore.collection("tasks").document(id).get().await()
+            val doc = taskCollection.document(id).get().await()
             doc.toObject(Task::class.java)
         } catch (e: Exception) {
             Log.e("TaskRepositoryRemote", "Error al obtener tarea por ID", e)
@@ -38,18 +40,24 @@ class TaskRepositoryRemote @Inject constructor(
     }
 
     suspend fun addTask(task: Task) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            val docRef = firestore.collection("tasks").document()
+        val userId = authManager.getCurrentUserId()
+        if (userId == null) {
+            Log.e("TaskRepositoryRemote", "Usuario no autenticado, no se puede agregar la tarea")
+            return
+        }
+
+        try {
+            val docRef = taskCollection.document()
             val taskWithId = task.copy(id = docRef.id, userId = userId)
             docRef.set(taskWithId).await()
+        } catch (e: Exception) {
+            Log.e("TaskRepositoryRemote", "Error al añadir tarea", e)
         }
     }
 
-
     suspend fun updateTask(task: Task) {
         try {
-            firestore.collection("tasks").document(task.id).set(task).await()
+            taskCollection.document(task.id).set(task).await()
         } catch (e: Exception) {
             Log.e("TaskRepositoryRemote", "Error al actualizar tarea", e)
         }
@@ -57,9 +65,32 @@ class TaskRepositoryRemote @Inject constructor(
 
     suspend fun deleteTask(id: String) {
         try {
-            firestore.collection("tasks").document(id).delete().await()
+            taskCollection.document(id).delete().await()
         } catch (e: Exception) {
             Log.e("TaskRepositoryRemote", "Error al eliminar tarea", e)
         }
     }
+
+    suspend fun getTasksByListId(listId: String): List<Task> {
+        val userId = authManager.getCurrentUserId() ?: return emptyList()
+
+        return try {
+            val snapshot = firestore.collection("tasks")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("listId", listId)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { it.toObject(Task::class.java)?.copy(id = it.id) }
+        } catch (e: Exception) {
+            Log.e("TaskRepositoryRemote", "Error al obtener tareas por lista", e)
+            emptyList()
+        }
+    }
+
+    fun getCurrentUserId(): String? {
+        return authManager.getCurrentUserId()
+    }
+
 }
+
