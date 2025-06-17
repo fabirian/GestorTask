@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.room.common.jvm)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.androidx.hilt.compiler)
@@ -94,6 +95,8 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     implementation (libs.androidx.navigation.compose)
+
+    implementation (libs.androidx.material.icons.extended)
 
 
     testImplementation(libs.junit)

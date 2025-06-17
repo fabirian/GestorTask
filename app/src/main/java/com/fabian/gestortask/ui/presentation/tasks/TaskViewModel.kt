@@ -40,6 +40,10 @@ class TaskViewModel @Inject constructor(
 
     val userId = remoteRepository.getCurrentUserId()?: ""
 
+    var isDefaultListLoaded by mutableStateOf(false)
+        private set
+
+
     fun getUserLists() {
         viewModelScope.launch {
             try {
@@ -59,8 +63,10 @@ class TaskViewModel @Inject constructor(
                 val defaultId = useCaseList.fetchDefaultListId(userId)
                 defaultListId = defaultId
                 if (currentListId == null) currentListId = defaultId
+                isDefaultListLoaded = true
             } catch (e: Exception) {
                 Log.e("TaskViewModel", "Error al obtener lista por defecto", e)
+                isDefaultListLoaded = true
             }
         }
     }
@@ -124,18 +130,23 @@ class TaskViewModel @Inject constructor(
 
     fun addNewTask(title: String, description: String) {
         viewModelScope.launch {
+            val finalListId = currentListId ?: defaultListId ?: run {
+                Log.e("TaskViewModel", "No hay lista disponible para asignar")
+                return@launch
+            }
+
             val task = Task(
                 id = "",
                 title = title,
                 description = description,
                 isDone = false,
-                listId = currentListId ?: defaultListId ?: "",
+                listId = finalListId,
                 userId = userId
             )
+
             addTask(task)
         }
     }
-
 
     fun updateTask(task: Task) {
         viewModelScope.launch {
@@ -161,10 +172,25 @@ class TaskViewModel @Inject constructor(
     }
 
     fun loadDefaultListTasks() {
-        defaultListId?.let {
-            currentListId = it
-            loadTasksByListId(it)
-        } ?: Log.e("TaskViewModel", "No se ha cargado la lista por defecto aún")
+        viewModelScope.launch {
+            try {
+                val listId = defaultListId ?: useCaseList.fetchDefaultListId(userId).also {
+                    defaultListId = it
+                    currentListId = it
+                }
+
+                val tasks = useCaseTask.getTasksByListId(listId)
+                _tasks.clear()
+                _tasks.addAll(tasks)
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Error al cargar tareas de la lista por defecto", e)
+            }
+        }
+    }
+
+    fun changeList(listId: String) {
+        currentListId = listId
+        loadTasksByListId(listId)
     }
 
     fun resetSaveState() {

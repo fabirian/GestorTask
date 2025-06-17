@@ -14,6 +14,7 @@ composeBom = "2024.04.01"
 hiltNavigationCompose = "1.2.0"
 ksp = "2.0.0-1.0.24"
 hiltAndroid = "2.52"
+materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.0"
 retrofit = "2.9.0"
 roomVersion = "2.6.1"
@@ -23,9 +24,11 @@ foundationAndroid = "1.6.6"
 foundationLayoutAndroid = "1.6.6"
 firebaseFirestoreKtx = "25.1.4"
 media3CommonKtx = "1.7.1"
+roomCommonJvm = "2.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
@@ -61,6 +64,7 @@ androidx-foundation-android = { group = "androidx.compose.foundation", name = "f
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
+androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,5 +1,6 @@
 package com.fabian.gestortask.ui.presentation.tasks
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,8 +26,8 @@ fun TaskScreen(
     var description by remember { mutableStateOf("") }
 
     LaunchedEffect(taskId) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
         taskId?.let { viewModel.loadTaskById(it) }
+        viewModel.loadDefaultListId(viewModel.userId)
     }
 
     LaunchedEffect(isTaskSaved) {
@@ -43,12 +44,18 @@ fun TaskScreen(
         }
     }
 
-    TaskForm(
-        title = title,
-        onTitleChange = { title = it },
-        description = description,
-        onDescriptionChange = { description = it },
-        onSaveClick = { viewModel.addNewTask(title, description) },
-        isEdit = taskId != null
-    )
+    if (viewModel.isDefaultListLoaded) {
+        TaskForm(
+            title = title,
+            onTitleChange = { title = it },
+            description = description,
+            onDescriptionChange = { description = it },
+            onSaveClick = {
+                viewModel.addNewTask(title, description)
+            },
+            isEdit = false
+        )
+    } else {
+        CircularProgressIndicator()
+    }
 }
