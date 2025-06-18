@@ -128,7 +128,7 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    fun addNewTask(title: String, description: String) {
+    fun addNewTask(title: String, description: String, tag: String, tagColor: String) {
         viewModelScope.launch {
             val finalListId = currentListId ?: defaultListId ?: run {
                 Log.e("TaskViewModel", "No hay lista disponible para asignar")
@@ -141,7 +141,9 @@ class TaskViewModel @Inject constructor(
                 description = description,
                 isDone = false,
                 listId = finalListId,
-                userId = userId
+                userId = userId,
+                tag = tag,
+                tagColor = tagColor
             )
 
             addTask(task)
@@ -151,7 +153,7 @@ class TaskViewModel @Inject constructor(
     fun updateTask(task: Task) {
         viewModelScope.launch {
             try {
-                useCaseTask.updateTask
+                useCaseTask.updateTask(task)
                 currentListId?.let { loadTasksByListId(it) } ?: loadTasks()
                 isTaskSaved = true
             } catch (e: Exception) {

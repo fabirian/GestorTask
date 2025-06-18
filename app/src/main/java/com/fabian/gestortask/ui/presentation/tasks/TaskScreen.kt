@@ -11,7 +11,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.ui.presentation.tasks.components.TaskForm
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun TaskScreen(
@@ -24,6 +23,8 @@ fun TaskScreen(
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var tag by remember { mutableStateOf("") }
+    var tagColor by remember { mutableStateOf("") }
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTaskById(it) }
@@ -41,6 +42,8 @@ fun TaskScreen(
         task?.let {
             title = it.title
             description = it.description
+            tag = it.tag
+            tagColor = it.tagColor
         }
     }
 
@@ -50,10 +53,35 @@ fun TaskScreen(
             onTitleChange = { title = it },
             description = description,
             onDescriptionChange = { description = it },
+            tag = tag,
+            onTagChange = { tag = it},
+            tagColor = tagColor,
+            onTagColorChange = { tagColor = it},
             onSaveClick = {
-                viewModel.addNewTask(title, description)
+                if (taskId == null) {
+                    viewModel.addNewTask(title, description, tag, tagColor)
+                } else {
+                    viewModel.updateTask(
+                        task?.copy(
+                            title = title,
+                            description = description,
+                            tag = tag,
+                            tagColor = tagColor
+                        ) ?: Task(
+                            id = "",
+                            title = title,
+                            description = description,
+                            isDone = false,
+                            listId = viewModel.defaultListId ?: "",
+                            userId = viewModel.userId,
+                            tag = tag,
+                            tagColor = tagColor
+                        )
+                    )
+
+                }
             },
-            isEdit = false
+            isEdit = taskId != null
         )
     } else {
         CircularProgressIndicator()

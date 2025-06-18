@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.ui.text.google.fonts)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.androidx.hilt.compiler)

@@ -1,6 +1,7 @@
 package com.fabian.gestortask.ui.presentation.perfil
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -8,6 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode.Companion.Color
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -15,6 +18,7 @@ import com.fabian.gestortask.domain.model.TaskList
 import com.fabian.gestortask.ui.navigation.Screen
 import com.fabian.gestortask.ui.presentation.tasks.TaskViewModel
 import com.fabian.gestortask.ui.presentation.tasks.components.BottomNavBar
+import com.fabian.gestortask.ui.utils.ColorLabels
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -97,6 +101,38 @@ fun PerfilScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text("Número de listas: ${userLists.size}")
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text("Editar nombres de etiquetas:", style = MaterialTheme.typography.titleMedium)
+
+            ColorLabels.editableColorLabels.forEach { (hex, label) ->
+                var newLabel by remember { mutableStateOf(label) }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(Color(android.graphics.Color.parseColor(hex)))
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedTextField(
+                        value = newLabel,
+                        onValueChange = {
+                            newLabel = it
+                            ColorLabels.editableColorLabels[hex] = it // Actualiza el mapa
+                        },
+                        label = { Text("Etiqueta") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
         }
     }
 }

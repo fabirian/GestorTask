@@ -6,6 +6,8 @@ data class Task(
     val description: String = "",
     val isDone: Boolean = false,
     val listId: String = "",
-    val userId: String = ""
+    val userId: String = "",
+    val tag: String = "",
+    val tagColor: String = ""
 )
 

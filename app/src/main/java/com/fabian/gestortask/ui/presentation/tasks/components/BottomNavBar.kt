@@ -1,5 +1,6 @@
 package com.fabian.gestortask.ui.presentation.tasks.components
 
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
@@ -15,7 +16,7 @@ import com.fabian.gestortask.ui.navigation.Screen
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    NavigationBar(containerColor = MaterialTheme.colorScheme.primary) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.inversePrimary) {
         NavigationBarItem(
             icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Tareas") },
             label = { Text("Listas") },
