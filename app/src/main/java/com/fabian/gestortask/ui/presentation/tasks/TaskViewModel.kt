@@ -17,7 +17,7 @@ import javax.inject.Inject
 class TaskViewModel @Inject constructor(
     private val useCaseTask: TaskUseCases,
     private val useCaseList: TaskListUseCases,
-    private  val remoteRepository: TaskRepositoryRemote
+    remoteRepository: TaskRepositoryRemote
 ) : ViewModel() {
 
     var isTaskSaved by mutableStateOf(false)
@@ -29,8 +29,7 @@ class TaskViewModel @Inject constructor(
     var currentTask by mutableStateOf<Task?>(null)
         private set
 
-    var currentListId by mutableStateOf<String?>(null)
-        private set
+    private var currentListId by mutableStateOf<String?>(null)
 
     private val _userLists = mutableStateListOf<TaskList>()
     val userLists: List<TaskList> get() = _userLists
@@ -94,7 +93,7 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    fun loadTasksByListId(listId: String) {
+    private fun loadTasksByListId(listId: String) {
         viewModelScope.launch {
             try {
                 val taskList = useCaseTask.getTasksByListId(listId)
@@ -116,7 +115,7 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    fun addTask(task: Task) {
+    private fun addTask(task: Task) {
         viewModelScope.launch {
             try {
                 useCaseTask.addTask(task)

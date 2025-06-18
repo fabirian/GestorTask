@@ -1,11 +1,20 @@
 package com.fabian.gestortask.di
 
+import com.fabian.gestortask.data.remote.ColorLabelRemoteDataSource
 import com.fabian.gestortask.data.remote.TaskListRepositoryRemote
 import com.fabian.gestortask.data.remote.TaskRepositoryRemote
+import com.fabian.gestortask.data.repository.ColorLabelRepositoryImpl
 import com.fabian.gestortask.data.repository.TaskListRepositoryImpl
 import com.fabian.gestortask.data.repository.TaskRepositoryImpl
+import com.fabian.gestortask.domain.repository.ColorLabelRepository
 import com.fabian.gestortask.domain.repository.TaskListRepository
 import com.fabian.gestortask.domain.repository.TaskRepository
+import com.fabian.gestortask.domain.usecases.colorlabel.AddColorLabel
+import com.fabian.gestortask.domain.usecases.colorlabel.ColorUseCase
+import com.fabian.gestortask.domain.usecases.colorlabel.DeleteColorLabel
+import com.fabian.gestortask.domain.usecases.colorlabel.EditColorLabel
+import com.fabian.gestortask.domain.usecases.colorlabel.GetColorLabels
+import com.fabian.gestortask.domain.usecases.colorlabel.SaveAllLabels
 import com.fabian.gestortask.domain.usecases.task.AddTask
 import com.fabian.gestortask.domain.usecases.task.DeleteTask
 import com.fabian.gestortask.domain.usecases.task.GetCurrentUserId
@@ -46,6 +55,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesColorLabelRepository(
+        remote: ColorLabelRemoteDataSource
+    ): ColorLabelRepository = ColorLabelRepositoryImpl(remote)
+
+    @Provides
+    @Singleton
     fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
         return TaskUseCases(
             addTask = AddTask(repository),
@@ -69,5 +84,15 @@ object AppModule {
         fetchDefaultListId = FetchDefaultListId(repository),
         updateDefaultListId = UpdateDefaultListId(repository)
     )
+
+     @Provides
+     @Singleton
+     fun providesColorUseCases(repository: ColorLabelRepository): ColorUseCase = ColorUseCase(
+         getColorLabels = GetColorLabels(repository),
+         addColorLabel = AddColorLabel(repository),
+         deleteColorLabel = DeleteColorLabel(repository),
+         editColorLabel = EditColorLabel(repository),
+         saveAllLabels = SaveAllLabels(repository)
+     )
 }
 

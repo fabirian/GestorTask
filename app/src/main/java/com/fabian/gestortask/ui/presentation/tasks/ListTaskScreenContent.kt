@@ -26,7 +26,8 @@ fun ListTaskScreenContent(
     tasks: List<Task>,
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
-    onCompleteClick: (Task) -> Unit
+    onCompleteClick: (Task) -> Unit,
+    onConfigurationClick: () -> Unit
 ) {
     var showCompleted by remember { mutableStateOf(false) }
 

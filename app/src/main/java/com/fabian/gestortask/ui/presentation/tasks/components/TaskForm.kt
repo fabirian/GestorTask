@@ -23,8 +23,10 @@ fun TaskForm(
     tagColor: String,
     onTagColorChange: (String) -> Unit,
     onSaveClick: () -> Unit,
-    isEdit: Boolean
-) {
+    isEdit: Boolean,
+    colorLabels: Map<String, String>
+)
+ {
 
     Column(modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
@@ -64,7 +66,7 @@ fun TaskForm(
                 .padding(vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ColorLabels.predefinedColors.forEach { hex ->
+            colorLabels.keys.forEach{ hex ->
                 val color = Color(android.graphics.Color.parseColor(hex))
                 Box(
                     modifier = Modifier
@@ -72,7 +74,7 @@ fun TaskForm(
                         .background(color, CircleShape)
                         .clickable {
                             onTagColorChange(hex)
-                            ColorLabels.editableColorLabels[hex]?.let { onTagChange(it) }
+                            colorLabels[hex]?.let { onTagChange(it) }
                         }
                         .border(
                             width = if (tagColor == hex) 3.dp else 1.dp,
@@ -85,7 +87,7 @@ fun TaskForm(
 
         if (tagColor.isNotEmpty()) {
             Text(
-                text = "Etiqueta sugerida: ${ColorLabels.editableColorLabels[tagColor] ?: "Personalizada"}",
+                text = "Etiqueta sugerida: ${colorLabels[tagColor] ?: "Personalizada"}",
                 modifier = Modifier.padding(top = 2.dp),
                 style = MaterialTheme.typography.bodySmall
             )

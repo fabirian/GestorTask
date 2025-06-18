@@ -13,7 +13,6 @@ class TaskListRepositoryRemote @Inject constructor(
     private val authManager: FirebaseAuthManager
 ) {
     private val tasksListCollection = firestore.collection("tasksLists")
-    private val taskCollection = firestore.collection("tasks")
 
     suspend fun getLists(): List<TaskList> {
         return try {

@@ -16,7 +16,8 @@ import com.fabian.gestortask.ui.presentation.tasks.components.TaskForm
 fun TaskScreen(
     navController: NavController,
     taskId: String?,
-    viewModel: TaskViewModel = hiltViewModel()
+    viewModel: TaskViewModel = hiltViewModel(),
+    colorLabelViewModel: ColorLabelViewModel = hiltViewModel()
 ) {
     val isTaskSaved = viewModel.isTaskSaved
     val task = viewModel.currentTask
@@ -26,9 +27,16 @@ fun TaskScreen(
     var tag by remember { mutableStateOf("") }
     var tagColor by remember { mutableStateOf("") }
 
+    val userId = viewModel.userId
+    val colorLabels = colorLabelViewModel.labels
+
+    LaunchedEffect(userId) {
+        colorLabelViewModel.load()
+    }
+
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTaskById(it) }
-        viewModel.loadDefaultListId(viewModel.userId)
+        viewModel.loadDefaultListId(userId)
     }
 
     LaunchedEffect(isTaskSaved) {
@@ -54,9 +62,9 @@ fun TaskScreen(
             description = description,
             onDescriptionChange = { description = it },
             tag = tag,
-            onTagChange = { tag = it},
+            onTagChange = { tag = it },
             tagColor = tagColor,
-            onTagColorChange = { tagColor = it},
+            onTagColorChange = { tagColor = it },
             onSaveClick = {
                 if (taskId == null) {
                     viewModel.addNewTask(title, description, tag, tagColor)
@@ -73,15 +81,15 @@ fun TaskScreen(
                             description = description,
                             isDone = false,
                             listId = viewModel.defaultListId ?: "",
-                            userId = viewModel.userId,
+                            userId = userId,
                             tag = tag,
                             tagColor = tagColor
                         )
                     )
-
                 }
             },
-            isEdit = taskId != null
+            isEdit = taskId != null,
+            colorLabels  = colorLabels.associate { it.colorHex to it.label }
         )
     } else {
         CircularProgressIndicator()

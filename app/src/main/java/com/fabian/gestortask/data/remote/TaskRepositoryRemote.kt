@@ -3,7 +3,6 @@ package com.fabian.gestortask.data.remote
 import android.util.Log
 import com.fabian.gestortask.auth.FirebaseAuthManager
 import com.fabian.gestortask.domain.model.Task
-import com.fabian.gestortask.domain.model.TaskList
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

@@ -33,9 +33,5 @@ class FirebaseAuthManager @Inject constructor(
 
     fun logout() = auth.signOut()
 
-    fun isLoggedIn(): Boolean = auth.currentUser != null
-
-    fun getCurrentUserEmail(): String? = auth.currentUser?.email
-
     fun getCurrentUserId(): String? = auth.currentUser?.uid
 }
