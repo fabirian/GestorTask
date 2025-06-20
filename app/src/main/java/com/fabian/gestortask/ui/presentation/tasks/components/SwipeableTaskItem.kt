@@ -1,13 +1,10 @@
 package com.fabian.gestortask.ui.presentation.tasks.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.fabian.gestortask.domain.model.Task
 
@@ -22,9 +19,8 @@ fun SwipeableTaskItem(
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
-                val completedTask = task.copy(isDone = true)
-                onComplete(completedTask)
-                true
+                onComplete(task.copy(isDone = true))
+                true // permite la animación de dismiss
             } else {
                 false
             }
@@ -41,11 +37,7 @@ fun SwipeableTaskItem(
                     .padding(end = 16.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Completar",
-                    tint = Color.White
-                )
+
             }
         },
         content = {

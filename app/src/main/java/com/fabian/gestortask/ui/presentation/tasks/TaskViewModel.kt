@@ -161,6 +161,23 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    fun markTaskAsCompletedInstant(task: Task) {
+        val updatedTask = task.copy(isDone = true)
+
+        val index = _tasks.indexOfFirst { it.id == task.id }
+        if (index != -1) {
+            _tasks[index] = updatedTask
+        }
+
+        viewModelScope.launch {
+            try {
+                useCaseTask.updateTask(updatedTask)
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Error al completar tarea", e)
+            }
+        }
+    }
+
     fun deleteTask(id: String) {
         viewModelScope.launch {
             try {

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.ui.presentation.tasks.components.SwipeableTaskItem
 import com.fabian.gestortask.ui.presentation.tasks.components.TaskItem
@@ -27,7 +28,8 @@ fun ListTaskScreenContent(
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
     onCompleteClick: (Task) -> Unit,
-    onConfigurationClick: () -> Unit
+    onConfigurationClick: () -> Unit,
+    viewModel: TaskViewModel = hiltViewModel()
 ) {
     var showCompleted by remember { mutableStateOf(false) }
 
@@ -39,12 +41,12 @@ fun ListTaskScreenContent(
         )
 
         LazyColumn {
-            items(tasks.filter { !it.isDone }) { task ->
+            items(tasks.filter { !it.isDone }, key = { it.id }) { task ->
                 SwipeableTaskItem(
                     task = task,
                     onEdit = { onEditClick(task.id) },
                     onDelete = { onDeleteClick(task.id) },
-                    onComplete = { onCompleteClick(task.copy(isDone = true)) }
+                    onComplete = { viewModel.markTaskAsCompletedInstant(task) }
                 )
             }
         }

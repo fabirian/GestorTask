@@ -54,7 +54,7 @@ fun ListTaskScreen(
                 tasks = tasks,
                 onEditClick = { taskId -> navController.navigate(Screen.EditTask.createRoute(taskId)) },
                 onDeleteClick = { taskId -> viewModel.deleteTask(taskId) },
-                onCompleteClick = { completedTask -> viewModel.updateTask(completedTask) },
+                onCompleteClick = { completedTask -> viewModel.markTaskAsCompletedInstant(completedTask) },
                 onConfigurationClick = { navController.navigate(Screen.Configuracion.route) }
             )
         }
