@@ -13,19 +13,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.fabian.gestortask.domain.model.User
 import com.fabian.gestortask.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ConfiguracionScreen(navController: NavController? = null) {
+fun ConfiguracionScreen(
+    navController: NavController? = null,
+    viewModel: ConfiguracionViewModel = hiltViewModel()
+) {
     val firebaseAuth = FirebaseAuth.getInstance()
-    val currentUser = remember { mutableStateOf(firebaseAuth.currentUser) }
+    val firebaseUser = firebaseAuth.currentUser
+    val uid = firebaseUser?.uid
 
-    LaunchedEffect(currentUser.value) {
-        println("DEBUG - UID: ${currentUser.value?.uid}")
-        println("DEBUG - Email: ${currentUser.value?.email}")
-        println("DEBUG - DisplayName: ${currentUser.value?.displayName}")
+    val userProfile by produceState<User?>(initialValue = null, key1 = uid) {
+        if (uid != null) {
+            value = viewModel.getUserProfile(uid)
+        }
     }
 
     Column(
@@ -65,13 +71,12 @@ fun ConfiguracionScreen(navController: NavController? = null) {
             }
         }
 
-        // Contenido
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.onPrimary)
         ) {
-            if (currentUser.value == null) {
+            if (firebaseUser == null) {
                 Text(
                     "Login",
                     modifier = Modifier
@@ -83,46 +88,25 @@ fun ConfiguracionScreen(navController: NavController? = null) {
                 )
             } else {
                 Text(
-                    text = "Welcome, ${currentUser.value?.email ?: currentUser.value?.displayName ?: "User"}",
+                    text = userProfile?.let { "Bienvenido, ${it.firstName} ${it.lastName}" }
+                        ?: "Cargando perfil...",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
             }
 
-            ButtonRow(
-                navController = navController,
-                route = Screen.Help.route,
-                text = "Help",
-                enabled = currentUser.value != null
-            )
-            ButtonRow(
-                navController = navController,
-                route = Screen.About.route,
-                text = "About Application",
-                enabled = currentUser.value != null
-            )
-            ButtonRow(
-                navController = navController,
-                route = Screen.Feedback.route,
-                text = "Send Feedback",
-                enabled = currentUser.value != null
-            )
-            ButtonRow(
-                navController = navController,
-                route = Screen.Support.route,
-                text = "Support",
-                enabled = currentUser.value != null
-            )
+            ButtonRow(navController, Screen.Help.route, "Help", firebaseUser != null)
+            ButtonRow(navController, Screen.About.route, "About Application", firebaseUser != null)
+            ButtonRow(navController, Screen.Feedback.route, "Send Feedback", firebaseUser != null)
+            ButtonRow(navController, Screen.Support.route, "Support", firebaseUser != null)
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Botón cerrar sesión (si hay usuario)
-            if (currentUser.value != null) {
+            if (firebaseUser != null) {
                 IconButton(
                     onClick = {
                         firebaseAuth.signOut()
-                        currentUser.value = null
                         navController?.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -138,6 +122,7 @@ fun ConfiguracionScreen(navController: NavController? = null) {
         }
     }
 }
+
 
 @Composable
 fun ButtonRow(navController: NavController?, route: String, text: String, enabled: Boolean) {

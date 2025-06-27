@@ -100,6 +100,7 @@ dependencies {
 
     implementation (libs.androidx.material.icons.extended)
 
+    implementation(libs.reorderable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

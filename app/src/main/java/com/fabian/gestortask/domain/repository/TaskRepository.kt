@@ -11,5 +11,6 @@ interface TaskRepository {
     suspend fun deleteTask(id: String)
     suspend fun getTasksByListId(listId: String): List<Task>
     suspend fun getCurrentUserId(): String?
+    suspend fun updateTasksPosition(tasks: List<Task>)
 }
 

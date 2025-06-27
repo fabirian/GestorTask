@@ -1,10 +1,12 @@
 package com.fabian.gestortask.ui.presentation.tasks.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun TaskItem(
@@ -21,13 +24,16 @@ fun TaskItem(
     tag: String,
     tagColor: String,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    dragHandle: Modifier = Modifier
 ) {
     val parsedColor = try {
-        Color(android.graphics.Color.parseColor(tagColor))
+        Color(tagColor.toColorInt())
     } catch (e: Exception) {
+        Log.e("TaskItem", "Error al parsear el color", e)
         Color(0xFFE0E0E0)
     }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -39,13 +45,26 @@ fun TaskItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 👇 Este botón será el "handle" para arrastrar la tarea
+            IconButton(
+                onClick = {},
+                modifier = dragHandle.padding(end = 8.dp) // 👈 Se aplica el dragHandle aquí
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DragHandle,
+                    contentDescription = "Arrastrar tarea"
+                )
+            }
+
             Text(
                 text = title,
                 modifier = Modifier.weight(1f)
             )
+
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Editar")
             }
+
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Eliminar")
             }

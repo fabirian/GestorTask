@@ -20,6 +20,11 @@ class TaskViewModel @Inject constructor(
     remoteRepository: TaskRepositoryRemote
 ) : ViewModel() {
 
+    var searchQuery by mutableStateOf("")
+    var selectedTag by mutableStateOf("")
+    var selectedListId by mutableStateOf<String?>(null)
+    var showOnlyCompleted by mutableStateOf<Boolean?>(null)
+
     var isTaskSaved by mutableStateOf(false)
         private set
 
@@ -214,5 +219,24 @@ class TaskViewModel @Inject constructor(
     fun resetSaveState() {
         isTaskSaved = false
     }
+
+    fun reorderTasks(newTasks: List<Task>) {
+        viewModelScope.launch {
+            try {
+                useCaseTask.updateTaskPosition(newTasks)
+                _tasks.clear()
+                _tasks.addAll(newTasks.sortedBy { it.position })
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Error al actualizar posiciones de tareas", e)
+            }
+        }
+    }
+    val filteredTasks: List<Task>
+        get() = tasks.filter { task ->
+            (searchQuery.isBlank() || task.title.contains(searchQuery, ignoreCase = true) || task.description.contains(searchQuery, ignoreCase = true)) &&
+                    (selectedTag.isBlank() || task.tag == selectedTag) &&
+                    (selectedListId == null || task.listId == selectedListId) &&
+                    (showOnlyCompleted == null || task.isDone == showOnlyCompleted)
+        }.sortedBy { it.position }
 
 }

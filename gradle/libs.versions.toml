@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.1"
+agp = "8.10.1"
 firebaseBom = "33.15.0"
 googleServices = "4.4.2"
 kotlin = "2.0.0"
@@ -16,6 +16,7 @@ ksp = "2.0.0-1.0.24"
 hiltAndroid = "2.52"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.0"
+reorderable = "2.5.1"
 retrofit = "2.9.0"
 roomVersion = "2.6.1"
 appcompat = "1.7.0"
@@ -60,6 +61,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltA
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltNavigationCompose" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }

@@ -4,14 +4,10 @@ package com.fabian.gestortask.ui.presentation.tasks
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -22,14 +18,13 @@ import com.fabian.gestortask.ui.presentation.tasks.components.BottomNavBar
 import com.fabian.gestortask.ui.utils.AppTopBar
 import com.fabian.gestortask.ui.utils.RequireAuth
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListTaskScreen(
     navController: NavController,
     viewModel: TaskViewModel = hiltViewModel()
 ) {
     RequireAuth(navController) {
-        val tasks = viewModel.tasks
+        val tasks = viewModel.filteredTasks
 
         LaunchedEffect(Unit) {
             viewModel.loadDefaultListTasks()
@@ -54,8 +49,7 @@ fun ListTaskScreen(
                 tasks = tasks,
                 onEditClick = { taskId -> navController.navigate(Screen.EditTask.createRoute(taskId)) },
                 onDeleteClick = { taskId -> viewModel.deleteTask(taskId) },
-                onCompleteClick = { completedTask -> viewModel.markTaskAsCompletedInstant(completedTask) },
-                onConfigurationClick = { navController.navigate(Screen.Configuracion.route) }
+                onCompleteClick = { taskId -> viewModel.markTaskAsCompletedInstant(taskId) }
             )
         }
     }

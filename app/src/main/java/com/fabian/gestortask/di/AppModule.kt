@@ -3,12 +3,15 @@ package com.fabian.gestortask.di
 import com.fabian.gestortask.data.remote.ColorLabelRemoteDataSource
 import com.fabian.gestortask.data.remote.TaskListRepositoryRemote
 import com.fabian.gestortask.data.remote.TaskRepositoryRemote
+import com.fabian.gestortask.data.remote.UserRemoteDataSource
 import com.fabian.gestortask.data.repository.ColorLabelRepositoryImpl
 import com.fabian.gestortask.data.repository.TaskListRepositoryImpl
 import com.fabian.gestortask.data.repository.TaskRepositoryImpl
+import com.fabian.gestortask.data.repository.UserRepositoryImpl
 import com.fabian.gestortask.domain.repository.ColorLabelRepository
 import com.fabian.gestortask.domain.repository.TaskListRepository
 import com.fabian.gestortask.domain.repository.TaskRepository
+import com.fabian.gestortask.domain.repository.UserRepository
 import com.fabian.gestortask.domain.usecases.colorlabel.AddColorLabel
 import com.fabian.gestortask.domain.usecases.colorlabel.ColorUseCase
 import com.fabian.gestortask.domain.usecases.colorlabel.DeleteColorLabel
@@ -23,6 +26,7 @@ import com.fabian.gestortask.domain.usecases.task.GetTasks
 import com.fabian.gestortask.domain.usecases.task.GetTasksByListId
 import com.fabian.gestortask.domain.usecases.task.TaskUseCases
 import com.fabian.gestortask.domain.usecases.task.UpdateTask
+import com.fabian.gestortask.domain.usecases.task.UpdateTasksPosition
 import com.fabian.gestortask.domain.usecases.tasklist.AddList
 import com.fabian.gestortask.domain.usecases.tasklist.DeleteList
 import com.fabian.gestortask.domain.usecases.tasklist.FetchDefaultListId
@@ -31,6 +35,9 @@ import com.fabian.gestortask.domain.usecases.tasklist.GetLists
 import com.fabian.gestortask.domain.usecases.tasklist.TaskListUseCases
 import com.fabian.gestortask.domain.usecases.tasklist.UpdateDefaultListId
 import com.fabian.gestortask.domain.usecases.tasklist.UpdateList
+import com.fabian.gestortask.domain.usecases.user.CreateUserProfile
+import com.fabian.gestortask.domain.usecases.user.GetUserProfile
+import com.fabian.gestortask.domain.usecases.user.UserUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,6 +68,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesUserRepository(
+        remote: UserRemoteDataSource
+    ): UserRepository = UserRepositoryImpl(remote)
+
+    @Provides
+    @Singleton
     fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
         return TaskUseCases(
             addTask = AddTask(repository),
@@ -69,7 +82,8 @@ object AppModule {
             updateTask = UpdateTask(repository),
             getTaskById = GetTaskById(repository),
             getTasksByListId = GetTasksByListId(repository),
-            getCurrentUserId = GetCurrentUserId(repository)
+            getCurrentUserId = GetCurrentUserId(repository),
+            updateTaskPosition = UpdateTasksPosition(repository)
         )
     }
 
@@ -94,5 +108,12 @@ object AppModule {
          editColorLabel = EditColorLabel(repository),
          saveAllLabels = SaveAllLabels(repository)
      )
+
+    @Provides
+    @Singleton
+    fun provideUserUseCases(repository: UserRepository): UserUseCase = UserUseCase(
+        createUserProfile = CreateUserProfile(repository),
+        getUserProfile = GetUserProfile(repository)
+    )
 }
 

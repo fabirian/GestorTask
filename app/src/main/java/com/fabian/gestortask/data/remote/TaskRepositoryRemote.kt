@@ -8,7 +8,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class TaskRepositoryRemote @Inject constructor(
-    val firestore: FirebaseFirestore,
+    private val firestore: FirebaseFirestore,
     private val authManager: FirebaseAuthManager
 ) {
 
@@ -86,6 +86,20 @@ class TaskRepositoryRemote @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun updateTasksPosition(tasks: List<Task>) {
+        try {
+            val batch = FirebaseFirestore.getInstance().batch()
+            tasks.forEach { task ->
+                val docRef = taskCollection.document(task.id)
+                batch.update(docRef, "position", task.position)
+            }
+            batch.commit().await()
+        } catch (e: Exception) {
+            Log.e("TaskRepositoryRemote", "Error al actualizar posiciones de tareas", e)
+        }
+    }
+
 
     fun getCurrentUserId(): String? {
         return authManager.getCurrentUserId()

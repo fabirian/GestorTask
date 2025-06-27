@@ -1,6 +1,5 @@
 package com.fabian.gestortask.data.repository
 
-import com.fabian.gestortask.data.remote.TaskListRepositoryRemote
 import com.fabian.gestortask.data.remote.TaskRepositoryRemote
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.domain.repository.TaskRepository
@@ -12,7 +11,13 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun getTasks(): List<Task> = remote.getTasks()
 
-    override suspend fun addTask(task: Task) = remote.addTask(task)
+    override suspend fun addTask(task: Task){
+        val maxPosition = remote.getTasksByListId(task.listId).maxByOrNull { it.position }?.position ?: 0
+
+        val taskWithNewPosition = task.copy(position = maxPosition + 1)
+
+        remote.addTask(taskWithNewPosition)
+    }
 
     override suspend fun getTaskById(id: String): Task? = remote.getTaskById(id)
 
@@ -24,4 +29,5 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentUserId(): String? = remote.getCurrentUserId()
 
+    override suspend fun updateTasksPosition(tasks: List<Task>) = remote.updateTasksPosition(tasks)
 }

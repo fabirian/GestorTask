@@ -23,7 +23,8 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    var name by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
@@ -43,7 +44,10 @@ fun RegisterScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.navigate(Screen.Login.route) }) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null
+                )
             }
             Text(
                 text = "Sign Up",
@@ -62,12 +66,23 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+
         val cornerRadius = 10.dp
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
+            value = firstName,
+            onValueChange = { firstName = it },
+            label = { Text("Nombre") },
+            shape = RoundedCornerShape(cornerRadius),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = { Text("Apellido") },
             shape = RoundedCornerShape(cornerRadius),
             modifier = Modifier.fillMaxWidth()
         )
@@ -87,7 +102,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(cornerRadius),
             modifier = Modifier.fillMaxWidth()
@@ -98,7 +113,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = repeatPassword,
             onValueChange = { repeatPassword = it },
-            label = { Text("Repeat Password") },
+            label = { Text("Repetir contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(cornerRadius),
             modifier = Modifier.fillMaxWidth()
@@ -116,7 +131,13 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                viewModel.registerUser(name, email, password, repeatPassword) {
+                viewModel.registerUser(
+                    firstName = firstName,
+                    lastName = lastName,
+                    email = email,
+                    password = password,
+                    repeatPassword = repeatPassword
+                ) {
                     navController.navigate("task_list") {
                         popUpTo("register") { inclusive = true }
                     }

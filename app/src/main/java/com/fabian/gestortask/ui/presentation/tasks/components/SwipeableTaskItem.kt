@@ -14,13 +14,15 @@ fun SwipeableTaskItem(
     task: Task,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onComplete: (Task) -> Unit
+    onComplete: (Task) -> Unit,
+    modifier: Modifier = Modifier,
+    dragHandle: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
                 onComplete(task.copy(isDone = true))
-                true // permite la animación de dismiss
+                true
             } else {
                 false
             }
@@ -46,7 +48,8 @@ fun SwipeableTaskItem(
                 tag = task.tag,
                 tagColor = task.tagColor,
                 onEdit = onEdit,
-                onDelete = onDelete
+                onDelete = onDelete,
+                dragHandle = dragHandle
             )
         }
     )

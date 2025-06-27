@@ -27,7 +27,6 @@ import com.fabian.gestortask.ui.utils.RequireAuth
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen(
     navController: NavHostController,
