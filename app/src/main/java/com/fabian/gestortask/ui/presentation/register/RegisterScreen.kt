@@ -138,7 +138,7 @@ fun RegisterScreen(
                     password = password,
                     repeatPassword = repeatPassword
                 ) {
-                    navController.navigate("task_list") {
+                    navController.navigate(Screen.List.route) {
                         popUpTo("register") { inclusive = true }
                     }
                 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TaskViewModel @Inject constructor(
+open class TaskViewModel @Inject constructor(
     private val useCaseTask: TaskUseCases,
     private val useCaseList: TaskListUseCases,
     remoteRepository: TaskRepositoryRemote
@@ -37,9 +37,9 @@ class TaskViewModel @Inject constructor(
     private var currentListId by mutableStateOf<String?>(null)
 
     private val _userLists = mutableStateListOf<TaskList>()
-    val userLists: List<TaskList> get() = _userLists
+    open val userLists: List<TaskList> get() = _userLists
 
-    var defaultListId by mutableStateOf<String?>(null)
+    open var defaultListId by mutableStateOf<String?>(null)
         private set
 
     val userId = remoteRepository.getCurrentUserId()?: ""

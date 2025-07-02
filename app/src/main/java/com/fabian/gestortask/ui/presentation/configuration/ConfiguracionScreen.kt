@@ -1,5 +1,6 @@
 package com.fabian.gestortask.ui.presentation.configuration
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ fun ConfiguracionScreen(
     val uid = firebaseUser?.uid
 
     val userProfile by produceState<User?>(initialValue = null, key1 = uid) {
+        Log.d("PerfilScreen", "UID recibido: $uid")
         if (uid != null) {
             value = viewModel.getUserProfile(uid)
         }
@@ -87,6 +89,9 @@ fun ConfiguracionScreen(
                         .padding(16.dp)
                 )
             } else {
+                LaunchedEffect(userProfile) {
+                    Log.d("PerfilScreen", "Perfil recibido: $userProfile")
+                }
                 Text(
                     text = userProfile?.let { "Bienvenido, ${it.firstName} ${it.lastName}" }
                         ?: "Cargando perfil...",

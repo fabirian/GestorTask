@@ -3,8 +3,9 @@ package com.fabian.gestortask.ui.presentation.perfil
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -25,15 +26,16 @@ import com.fabian.gestortask.ui.utils.AppTopBar
 import com.fabian.gestortask.ui.utils.ColorLabels
 import com.fabian.gestortask.ui.utils.RequireAuth
 import com.google.firebase.auth.FirebaseAuth
+import androidx.core.graphics.toColorInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PerfilScreen(
     navController: NavHostController,
     viewModel: TaskViewModel = hiltViewModel(),
     colorLabelViewModel: ColorLabelViewModel = hiltViewModel()
-)
-{
+) {
     RequireAuth(navController) {
         val user = remember { FirebaseAuth.getInstance().currentUser }
         val userId = user?.uid
@@ -44,9 +46,12 @@ fun PerfilScreen(
 
         var expanded by remember { mutableStateOf(false) }
         var selectedList by remember { mutableStateOf<TaskList?>(null) }
-
         var selectedColorHex by remember { mutableStateOf("") }
         var newColorLabel by remember { mutableStateOf("") }
+
+        var showEditDialog by remember { mutableStateOf(false) }
+        var colorToEdit by remember { mutableStateOf("") }
+        var labelToEdit by remember { mutableStateOf("") }
 
         LaunchedEffect(userId) {
             userId?.let {
@@ -60,154 +65,239 @@ fun PerfilScreen(
             selectedList = userLists.find { it.id == defaultListId }
         }
 
+        if (showEditDialog) {
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                title = { Text("Editar etiqueta") },
+                text = {
+                    Column {
+                        Text("Color:")
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(Color(colorToEdit.toColorInt()), CircleShape)
+                                .border(2.dp, Color.Black, CircleShape)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = labelToEdit,
+                            onValueChange = { labelToEdit = it },
+                            label = { Text("Nombre") }
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        colorLabelViewModel.updateLocalLabel(colorToEdit, labelToEdit)
+                        showEditDialog = false
+                    }) {
+                        Text("Guardar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEditDialog = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
+        }
+
         Scaffold(
             bottomBar = { BottomNavBar(navController) },
             topBar = {
                 AppTopBar(
                     title = { Text("Mis Listas") },
-                    onSettingsClick = { navController.navigate(Screen.Configuracion.route)
-                    }
+                    onSettingsClick = { navController.navigate(Screen.Configuracion.route) }
                 )
             }
-        )
-        {
-            Column(
+        ) {
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                Text(text = "Perfil", style = MaterialTheme.typography.headlineMedium)
+                item {
+                    Text("Configuración de listas", style = MaterialTheme.typography.headlineSmall)
+                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                // --- Lista por defecto ---
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Lista por defecto", style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.height(8.dp))
 
-                Text(text = "Lista por defecto:")
+                            ExposedDropdownMenuBox(
+                                expanded = expanded,
+                                onExpandedChange = { expanded = !expanded }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedList?.name ?: "",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                                    label = { Text("Seleccionar lista") },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }
+                                )
 
-                Box {
-                    Button(onClick = { expanded = true }) {
-                        Text(selectedList?.name ?: "Seleccionar lista")
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        userLists.forEach { list ->
-                            DropdownMenuItem(
-                                text = { Text(list.name) },
-                                onClick = {
-                                    selectedList = list
-                                    expanded = false
-                                    userId?.let { uid ->
-                                        viewModel.setDefaultListId(uid, list.id)
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    userLists.forEach { list ->
+                                        DropdownMenuItem(
+                                            text = { Text(list.name) },
+                                            onClick = {
+                                                selectedList = list
+                                                expanded = false
+                                                userId?.let { uid ->
+                                                    viewModel.setDefaultListId(uid, list.id)
+                                                }
+                                            }
+                                        )
                                     }
                                 }
-                            )
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Número de listas: ${userLists.size}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
-                Text("Número de listas: ${userLists.size}")
-                Spacer(modifier = Modifier.height(32.dp))
+                // --- Etiquetas existentes (ícono para editar) ---
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Editar etiquetas existentes", style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.height(8.dp))
 
-                Text("Editar nombres de etiquetas:", style = MaterialTheme.typography.titleMedium)
+                            colorLabels.forEach { colorLabel ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .background(Color(colorLabel.colorHex.toColorInt()), CircleShape)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
 
-                colorLabels.forEach { colorLabel ->
-                    var editableLabel by remember { mutableStateOf(colorLabel.label) }
+                                    Text(
+                                        text = colorLabel.label,
+                                        modifier = Modifier.weight(1f)
+                                    )
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .background(Color(android.graphics.Color.parseColor(colorLabel.colorHex)))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedTextField(
-                            value = editableLabel,
-                            onValueChange = {
-                                editableLabel = it
-                                colorLabelViewModel.updateLocalLabel(colorLabel.colorHex, it)
-                            },
-                            label = { Text("Etiqueta") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(onClick = {
-                            colorLabelViewModel.deleteLabel(colorLabel.colorHex)
-                        }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Eliminar color")
-                        }
-                    }
-                }
+                                    IconButton(onClick = {
+                                        colorToEdit = colorLabel.colorHex
+                                        labelToEdit = colorLabel.label
+                                        showEditDialog = true
+                                    }) {
+                                        Icon(Icons.Default.Add, contentDescription = "Editar")
+                                    }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text("Agregar nuevo color:", style = MaterialTheme.typography.titleMedium)
-                Text("Selecciona un color:", style = MaterialTheme.typography.bodyMedium)
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    ColorLabels.predefinedColors.forEach { hex ->
-                        val color = Color(android.graphics.Color.parseColor(hex))
-                        val isUsed = colorLabels.any { it.colorHex == hex }
-
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(color, MaterialTheme.shapes.small)
-                                .border(
-                                    width = if (selectedColorHex == hex) 3.dp else 1.dp,
-                                    color = if (selectedColorHex == hex) Color.Black else Color.Gray,
-                                    shape = MaterialTheme.shapes.small
-                                )
-                                .let {
-                                    if (!isUsed) it.clickable { selectedColorHex = hex } else it
+                                    IconButton(onClick = {
+                                        colorLabelViewModel.deleteLabel(colorLabel.colorHex)
+                                    }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                                    }
                                 }
-                        )
+                            }
+                        }
+                    }
+                }
+// --- Agregar nueva etiqueta ---
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Agregar nueva etiqueta", style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.height(8.dp))
+                            Text("Selecciona un color", style = MaterialTheme.typography.bodyMedium)
+
+                            var colorMenuExpanded by remember { mutableStateOf(false) }
+
+                            Box {
+                                Button(
+                                    onClick = { colorMenuExpanded = true },
+                                    modifier = Modifier.size(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = if (selectedColorHex.isNotBlank()) Color(selectedColorHex.toColorInt()) else Color.Gray),
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {}
+
+                                DropdownMenu(
+                                    expanded = colorMenuExpanded,
+                                    onDismissRequest = { colorMenuExpanded = false }
+                                ) {
+                                    ColorLabels.predefinedColors.forEach { hex ->
+                                        val color = Color(hex.toColorInt())
+                                        val isUsed = colorLabels.any { it.colorHex == hex }
+
+                                        DropdownMenuItem(
+                                            text = {},
+                                            leadingIcon = {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(24.dp)
+                                                        .background(color, CircleShape)
+                                                )
+                                            },
+                                            onClick = {
+                                                if (!isUsed) {
+                                                    selectedColorHex = hex
+                                                    colorMenuExpanded = false
+                                                }
+                                            },
+                                            enabled = !isUsed
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(Modifier.height(8.dp))
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                OutlinedTextField(
+                                    value = newColorLabel,
+                                    onValueChange = { newColorLabel = it },
+                                    label = { Text("Nombre de etiqueta") },
+                                    modifier = Modifier.weight(1f),
+                                    singleLine = true
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = {
+                                        colorLabelViewModel.addLabel(
+                                            selectedColorHex,
+                                            newColorLabel
+                                        )
+                                        selectedColorHex = ""
+                                        newColorLabel = ""
+                                    },
+                                    enabled = selectedColorHex.isNotBlank() && newColorLabel.isNotBlank()
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = "Agregar")
+                                }
+                            }
+                        }
                     }
                 }
 
-                OutlinedTextField(
-                    value = newColorLabel,
-                    onValueChange = { newColorLabel = it },
-                    label = { Text("Etiqueta") },
-                    modifier = Modifier.fillMaxWidth()
-                )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = {
-                        if (selectedColorHex.isNotBlank() && newColorLabel.isNotBlank()) {
-                            colorLabelViewModel.addLabel(selectedColorHex, newColorLabel)
-                            selectedColorHex = ""
-                            newColorLabel = ""
-                        }
-                    },
-                    enabled = selectedColorHex.isNotBlank() && newColorLabel.isNotBlank()
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Agregar color")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Agregar")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { colorLabelViewModel.saveAllLabels() },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("Guardar etiquetas")
+                // --- Guardar cambios ---
+                item {
+                    Button(
+                        onClick = { colorLabelViewModel.saveAllLabels() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Guardar etiquetas")
+                    }
                 }
             }
         }

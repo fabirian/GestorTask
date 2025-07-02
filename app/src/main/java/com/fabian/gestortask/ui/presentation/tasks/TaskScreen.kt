@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fabian.gestortask.domain.model.Task
 import com.fabian.gestortask.ui.presentation.tasks.components.TaskForm
+import com.fabian.gestortask.ui.utils.DefaultTag
 
 @Composable
 fun TaskScreen(
@@ -29,6 +30,8 @@ fun TaskScreen(
 
     val userId = viewModel.userId
     val colorLabels = colorLabelViewModel.labels
+    val predefinedTags = DefaultTag.predefinedTags
+
 
     LaunchedEffect(userId) {
         colorLabelViewModel.load()
@@ -89,7 +92,8 @@ fun TaskScreen(
                 }
             },
             isEdit = taskId != null,
-            colorLabels  = colorLabels.associate { it.colorHex to it.label }
+            colorLabels  = colorLabels.associate { it.colorHex to it.label },
+            predefinedTags = predefinedTags
         )
     } else {
         CircularProgressIndicator()

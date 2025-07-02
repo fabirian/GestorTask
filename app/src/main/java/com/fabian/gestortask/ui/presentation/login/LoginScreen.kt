@@ -31,7 +31,7 @@ fun LoginScreen(
     LaunchedEffect(loginResult) {
         loginResult?.let {
             if (it.isSuccess) {
-                navController.navigate("task_list") {
+                navController.navigate(Screen.List.route) {
                     popUpTo("login") { inclusive = true }
                 }
                 viewModel.resetLoginResult()

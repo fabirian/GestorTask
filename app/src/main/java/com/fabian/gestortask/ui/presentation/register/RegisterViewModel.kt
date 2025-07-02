@@ -59,7 +59,7 @@ class RegisterViewModel @Inject constructor(
                             _errorMessage.value = null
                             onSuccess()
                         } catch (e: Exception) {
-                            _errorMessage.value = "Error al guardar perfil del usuario."
+                            _errorMessage.value = "Error al guardar perfil del usuario: ${e.message}"
                             _successMessage.value = null
                         }
                     } else {

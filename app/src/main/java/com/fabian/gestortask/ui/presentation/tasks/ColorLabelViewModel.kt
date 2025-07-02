@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ColorLabelViewModel @Inject constructor(
+open class ColorLabelViewModel @Inject constructor(
     private val colorUseCase: ColorUseCase
 ) : ViewModel() {
 
-    var labels by mutableStateOf<List<ColorLabel>>(emptyList())
+    open var labels by mutableStateOf<List<ColorLabel>>(emptyList())
 
     fun load() {
         viewModelScope.launch {
