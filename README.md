@@ -53,7 +53,7 @@ GestorTask es una aplicación de productividad enfocada en ayudarte a organizar 
 ## 🧑‍💻 Autor
 
 Arlex Fabian Galindez Rivera
-💼 [LinkedIn][https://www.linkedin.com/in/afgalindez/]
+💼 [LinkedIn](https://www.linkedin.com/in/afgalindez/)
 📧 fabirir99@gmail.com
 
 ---
